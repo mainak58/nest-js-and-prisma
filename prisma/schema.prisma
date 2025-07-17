@@ -14,19 +14,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  name  String?
-  posts Post[]
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  blogs     Blog[]
+  comments  Comments[]
 }
 
-model Post {
-  id        Int      @default(autoincrement()) @id  
-  title     String
-  content   String?
-  published Boolean? @default(false)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+model Blog {
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  userId        Int?
+  isDeleted     Boolean         @default(false)
+  commentId     Int?
+  tagId         Int?
+  user          User?           @relation(fields: [userId], references: [id])
+  tag           Tags?           @relation(fields: [tagId], references: [id])
+  comments      Comments[]
+  attachments   Attachments[]
+  relatedFields RelatedFields[]
+}
+
+model Comments {
+  id            Int  @id @default(autoincrement())
+  userId        Int?
+  blogId        Int?
+  commentId     Int?
+  attachmentsId Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  blog        Blog?        @relation(fields: [blogId], references: [id])
+  user        User?        @relation(fields: [userId], references: [id])
+  attachments Attachments? @relation(fields: [attachmentsId], references: [id])
+
+  parent  Comments?  @relation("CommentReplies", fields: [commentId], references: [id])
+  replies Comments[] @relation("CommentReplies")
+}
+
+model RelatedFields {
+  id     Int            @id @default(autoincrement())
+  blogId Int?
+  Blog   Blog?          @relation(fields: [blogId], references: [id])
+  slug   RelatedField[]
+}
+
+model RelatedField {
+  id              Int            @id @default(autoincrement())
+  title           String?
+  relatedFieldsId Int?
+  RelatedFields   RelatedFields? @relation(fields: [relatedFieldsId], references: [id])
+}
+
+model Attachments {
+  id       Int        @id @default(autoincrement())
+  blogId   Int?
+  Blog     Blog?      @relation(fields: [blogId], references: [id])
+  Comments Comments[]
+}
+
+model Tags {
+  id    Int     @id @default(autoincrement())
+  title String?
+  Blog  Blog[]
 }
