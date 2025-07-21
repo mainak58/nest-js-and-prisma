@@ -1,11 +1,38 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  MessageBody,
+} from '@nestjs/websockets';
 import { BlogService } from './blog.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
+import { JwtService } from '@nestjs/jwt';
+import { Socket } from 'socket.io';
 
 @WebSocketGateway()
 export class BlogGateway {
-  constructor(private readonly blogService: BlogService) {}
+  constructor(
+    private blogService: BlogService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  handleConnection(client: Socket) {
+    const token =
+      client.handshake.auth?.token ||
+      client.handshake.headers?.authorization?.split(' ')[1];
+    if (!token) {
+      client.disconnect();
+      return;
+    }
+
+    try {
+      const payload = this.jwtService.verify(token);
+      const userId = payload.sub;
+      client.data.userId = userId;
+    } catch (error) {
+      client.disconnect();
+    }
+  }
 
   @SubscribeMessage('createBlog')
   create(@MessageBody() createBlogDto: CreateBlogDto) {
