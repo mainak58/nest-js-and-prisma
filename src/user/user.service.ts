@@ -31,14 +31,7 @@ export class UserService {
       throw new CustomException('Failed to created new user');
     }
 
-    return {
-      newUser: {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        createdAt: newUser.createdAt,
-      },
-    };
+    return newUser;
   }
 
   async signInUser(email: string, password: string) {

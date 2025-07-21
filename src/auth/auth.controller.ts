@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth.guard';
 import { SubscribeMessage } from '@nestjs/websockets';
 import { SignInDto } from './dto/signin.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +21,14 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   signIn(@Body() signInDto: SignInDto) {
-    return this.authServices.signIn(signInDto.username, signInDto.password);
+    return this.authServices.signIn(signInDto.email, signInDto.password);
+  }
+
+
+  @Post('signup')
+  @HttpCode(HttpStatus.OK)
+  signUp(@Body() dto: CreateUserDto) {
+    return this.authServices.signUp(dto);
   }
 
   @UseGuards(AuthGuard)
