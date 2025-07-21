@@ -12,21 +12,25 @@ export class AuthService {
     private authGateway: AuthGateway,
   ) {}
 
-  async signIn(userName: string, pass: string) {
-    const user = await this.userService.findOne(userName);
+  async signUp(username: string, password: string) {}
+
+  async signIn(email: string, password: string) {
+    const user = await this.userService.signInUser(email, password);
     if (!user) {
-      throw new CustomException('Please provide a valid username');
+      throw new CustomException('Please provide a valid email');
     }
-    if (user?.password !== pass) {
-      throw new UnauthorizedException();
-    }
-    const payload = { sub: user.userId, username: user.username };
+    const payload = { sub: user.id, email: user.email };
+    console.log('payload,---', payload);
     const token = await this.jwtService.signAsync(payload);
 
     this.authGateway.emitLoginEvent(payload);
     return {
       access_token: token,
-      payload,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
     };
   }
 }

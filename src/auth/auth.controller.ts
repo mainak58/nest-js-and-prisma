@@ -11,6 +11,7 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth.guard';
 import { SubscribeMessage } from '@nestjs/websockets';
+import { SignInDto } from './dto/signin.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -18,7 +19,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto) {
+  signIn(@Body() signInDto: SignInDto) {
     return this.authServices.signIn(signInDto.username, signInDto.password);
   }
 
@@ -27,5 +28,4 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
-
 }
