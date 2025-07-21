@@ -40,7 +40,6 @@ export class AuthService {
       throw new CustomException('Please provide a valid email');
     }
     const payload = { sub: user.id, email: user.email };
-    console.log('payload,---', payload);
     const token = await this.jwtService.signAsync(payload);
 
     this.authGateway.emitLoginEvent(payload);
