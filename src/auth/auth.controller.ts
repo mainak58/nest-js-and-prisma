@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth.guard';
+import { SubscribeMessage } from '@nestjs/websockets';
 
 @Controller('auth')
 export class AuthController {
@@ -26,4 +27,5 @@ export class AuthController {
   getProfile(@Request() req) {
     return req.user;
   }
+
 }
